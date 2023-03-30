@@ -1,0 +1,91 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Pomodoro Timer</title>
+</head>
+
+<style>
+  #progress-bar{
+    width: 100%;
+    height: 0.5vh;
+    background-color: red;
+    border-radius: 10px;
+  }
+</style>
+<body>
+  <h1 id="timer">25:00</h1>
+  <div id="progress-bar"></div>
+  <button id="start">Start</button>
+  <button id="stop">Stop</button>
+  <button id="reset">Reset</button>
+  <form>
+    <label for="work-length">Work Length (minutes):</label>
+    <input type="number" id="work-length" min="1" max="60" value="25">
+    <br>
+    <label for="break-length">Break Length (minutes):</label>
+    <input type="number" id="break-length" min="1" max="60" value="5">
+  </form>
+
+  <script>
+    const timerDisplay = document.getElementById('timer');
+    const progressBar = document.getElementById('progress-bar');
+    const startButton = document.getElementById('start');
+    const stopButton = document.getElementById('stop');
+    const resetButton = document.getElementById('reset');
+    const workLengthInput = document.getElementById('work-length');
+    const breakLengthInput = document.getElementById('break-length');
+
+    let workLength = parseInt(workLengthInput.value) * 60; // in seconds
+    let breakLength = parseInt(breakLengthInput.value) * 60; // in seconds
+    let timeLeft = workLength;
+    let timerId;
+    let isWorking = true;
+
+    function startTimer() {
+      timerId = setInterval(() => {
+        const minutes = Math.floor(timeLeft / 60);
+        const seconds = timeLeft % 60;
+        timerDisplay.innerText = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        progressBar.style.width = `${(1 - timeLeft / (isWorking ? workLength : breakLength)) * 100}%`;
+        if (timeLeft <= 0) {
+          clearInterval(timerId);
+          alert(`Time is up! Take a ${isWorking ? 'break' : 'work'}!`);
+          isWorking = !isWorking;
+          timeLeft = isWorking ? workLength : breakLength;
+          timerDisplay.innerText = `${Math.floor(timeLeft / 60).toString().padStart(2, '0')}:${(timeLeft % 60).toString().padStart(2, '0')}`;
+          progressBar.style.width = '0%';
+          startTimer();
+        } else {
+          timeLeft--;
+        }
+      }, 1000);
+    }
+
+    function stopTimer() {
+      clearInterval(timerId);
+    }
+
+    function resetTimer() {
+      clearInterval(timerId);
+      workLength = parseInt(workLengthInput.value) * 60;
+      breakLength = parseInt(breakLengthInput.value) * 60;
+      timeLeft = workLength;
+      isWorking = true;
+      timerDisplay.innerText = `${Math.floor(timeLeft / 60).toString().padStart(2, '0')}:${(timeLeft % 60).toString().padStart(2, '0')}`;
+      progressBar.style.width = '0%';
+    }
+
+    startButton.addEventListener('click', startTimer);
+    stopButton.addEventListener('click', stopTimer);
+    resetButton.addEventListener('click', resetTimer);
+    workLengthInput.addEventListener('change', resetTimer);
+    breakLengthInput.addEventListener('change', resetTimer);
+
+      // POMODORO TIMER COM PROGRESS BAR
+
+
+  </script>
+</body>
+</html>
